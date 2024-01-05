@@ -2250,7 +2250,7 @@ public class StatefulPersistenceContext implements PersistenceContext {
 
 				@Override
 				public Collection<?> getCachedPkResolutions(EntityMappingType entityDescriptor) {
-					return null;
+					return Collections.emptyList();
 				}
 
 				@Override
