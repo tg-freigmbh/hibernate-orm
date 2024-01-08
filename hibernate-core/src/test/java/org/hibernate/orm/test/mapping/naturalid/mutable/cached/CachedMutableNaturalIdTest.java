@@ -9,12 +9,14 @@ package org.hibernate.orm.test.mapping.naturalid.mutable.cached;
 import org.hibernate.LockOptions;
 import org.hibernate.cache.spi.CacheImplementor;
 import org.hibernate.internal.SessionFactoryImpl;
+import org.hibernate.orm.test.mapping.naturalid.mutable.User;
 import org.hibernate.stat.spi.StatisticsImplementor;
 
 import org.hibernate.testing.TestForIssue;
 import org.hibernate.testing.orm.junit.JiraKey;
 import org.hibernate.testing.orm.junit.SessionFactoryScope;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -131,7 +133,7 @@ public abstract class CachedMutableNaturalIdTest {
 		);
 		
 		// finally there should be only 2 NaturalIdCache puts : 1. insertion, 2. when updating natural-id from 'it' to 'it2'
-		assertEquals( 2, statistics.getNaturalIdCachePutCount() );
+		assertEquals( scope.getSessionFactory().getSessionFactoryOptions().isEnableNaturalIdCache()? 2:0,statistics.getNaturalIdCachePutCount() );
 	}
 	
 	@Test
@@ -152,10 +154,19 @@ public abstract class CachedMutableNaturalIdTest {
 					it.setName( "it2" );
 
 					final AllCached shouldBeGone = session.bySimpleNaturalId( AllCached.class ).load( "it" );
-					assertNull( shouldBeGone );
-
+					//if there is a cache, hibernate gives you changes that havent been flushed to the db,
+					// otherwise it gives you the db state
+					if (scope.getSessionFactory().getSessionFactoryOptions().isEnableNaturalIdCache()) {
+						assertNull(shouldBeGone);
+					} else {
+						assertNotNull(shouldBeGone);
+					}
 					final AllCached updated = session.bySimpleNaturalId( AllCached.class ).load( "it2" );
-					assertNotNull( updated );
+					if (scope.getSessionFactory().getSessionFactoryOptions().isEnableNaturalIdCache()) {
+						assertNotNull( updated );
+					} else {
+						assertNull(updated);
+					}
 				}
 		);
 	}
@@ -183,6 +194,7 @@ public abstract class CachedMutableNaturalIdTest {
 	@Test
 	@JiraKey("HHH-16558")
 	public void testCacheVerifyHits(SessionFactoryScope scope) {
+		Assumptions.assumeTrue(scope.getSessionFactory().getSessionFactoryOptions().isEnableNaturalIdCache());
 		scope.inTransaction((session) -> {
 			AllCached aAllCached = new AllCached();
 			aAllCached.setName("John Doe");
