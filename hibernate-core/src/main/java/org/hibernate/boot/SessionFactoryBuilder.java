@@ -120,6 +120,14 @@ public interface SessionFactoryBuilder {
 	SessionFactoryBuilder applyStatisticsSupport(boolean enabled);
 
 	/**
+	 * Allows you to disable
+	 *
+	 * @param skipped {@code true} no first or second level caching of natural Ids
+	 * @return {@code this}, for method chaining
+	 */
+	SessionFactoryBuilder enableNaturalIdCache(boolean skipped);
+
+	/**
 	 * Specifies an {@link Interceptor} associated with the {@link SessionFactory},
 	 * which will be used by all sessions unless an interceptor is explicitly
 	 * specified using {@link org.hibernate.SessionBuilder#interceptor}.

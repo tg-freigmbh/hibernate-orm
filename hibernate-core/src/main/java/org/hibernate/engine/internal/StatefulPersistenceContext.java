@@ -2206,65 +2206,71 @@ public class StatefulPersistenceContext implements PersistenceContext {
 	@Override
 	public NaturalIdResolutions getNaturalIdResolutions() {
 		if ( naturalIdResolutions == null ) {
-			naturalIdResolutions = new NaturalIdResolutions() {
-				@Override
-				public boolean cacheResolution(Object id, Object naturalId, EntityMappingType entityDescriptor) {
-					return false;
-				}
+			final var delegate = new NaturalIdResolutionsImpl(this);
+			if (getSession().getFactory().getSessionFactoryOptions().isEnableNaturalIdCache()) {
+				naturalIdResolutions = delegate;
+			} else {
+				naturalIdResolutions = new NaturalIdResolutions() {
+					@Override
+					public boolean cacheResolution(Object id, Object naturalId, EntityMappingType entityDescriptor) {
+						return false;
+					}
 
-				@Override
-				public Object removeResolution(Object id, Object naturalId, EntityMappingType entityDescriptor) {
-					return null;
-				}
+					@Override
+					public Object removeResolution(Object id, Object naturalId, EntityMappingType entityDescriptor) {
+						return null;
+					}
 
-				@Override
-				public void cacheResolutionFromLoad(Object id, Object naturalId, EntityMappingType entityDescriptor) {
-				}
+					@Override
+					public void cacheResolutionFromLoad(Object id, Object naturalId, EntityMappingType entityDescriptor) {
+					}
 
-				@Override
-				public void manageLocalResolution(Object id, Object naturalIdValue, EntityMappingType entityDescriptor, CachedNaturalIdValueSource source) {
-				}
+					@Override
+					public void manageLocalResolution(Object id, Object naturalIdValue, EntityMappingType entityDescriptor, CachedNaturalIdValueSource source) {
+					}
 
-				@Override
-				public Object removeLocalResolution(Object id, Object naturalId, EntityMappingType entityDescriptor) {
-					return null;
-				}
+					@Override
+					public Object removeLocalResolution(Object id, Object naturalId, EntityMappingType entityDescriptor) {
+						return delegate.removeLocalResolution(id, naturalId, entityDescriptor);
+					}
 
-				@Override
-				public void manageSharedResolution(Object id, Object naturalId, Object previousNaturalId, EntityMappingType entityDescriptor, CachedNaturalIdValueSource source) {
-				}
+					@Override
+					public void manageSharedResolution(Object id, Object naturalId, Object previousNaturalId, EntityMappingType entityDescriptor, CachedNaturalIdValueSource source) {
+					}
 
-				@Override
-				public void removeSharedResolution(Object id, Object naturalId, EntityMappingType entityDescriptor) {
-				}
+					@Override
+					public void removeSharedResolution(Object id, Object naturalId, EntityMappingType entityDescriptor) {
+						delegate.removeSharedResolution(id, naturalId, entityDescriptor);
+					}
 
-				@Override
-				public Object findCachedNaturalIdById(Object id, EntityMappingType entityDescriptor) {
-					return null;
-				}
+					@Override
+					public Object findCachedNaturalIdById(Object id, EntityMappingType entityDescriptor) {
+						return null;
+					}
 
-				@Override
-				public Object findCachedIdByNaturalId(Object naturalId, EntityMappingType entityDescriptor) {
-					return null;
-				}
+					@Override
+					public Object findCachedIdByNaturalId(Object naturalId, EntityMappingType entityDescriptor) {
+						return null;
+					}
 
-				@Override
-				public Collection<?> getCachedPkResolutions(EntityMappingType entityDescriptor) {
-					return Collections.emptyList();
-				}
+					@Override
+					public Collection<?> getCachedPkResolutions(EntityMappingType entityDescriptor) {
+						return Collections.emptyList();
+					}
 
-				@Override
-				public void handleSynchronization(Object id, Object entity, EntityMappingType entityDescriptor) {
-				}
+					@Override
+					public void handleSynchronization(Object id, Object entity, EntityMappingType entityDescriptor) {
+					}
 
-				@Override
-				public void cleanupFromSynchronizations() {
-				}
+					@Override
+					public void cleanupFromSynchronizations() {
+					}
 
-				@Override
-				public void handleEviction(Object id, Object object, EntityMappingType entityDescriptor) {
-				}
-			};
+					@Override
+					public void handleEviction(Object id, Object object, EntityMappingType entityDescriptor) {
+					}
+				};
+			}
 		}
 		return naturalIdResolutions;
 	}

@@ -96,6 +96,12 @@ public abstract class AbstractDelegatingSessionFactoryBuilder<T extends SessionF
 	}
 
 	@Override
+	public SessionFactoryBuilder enableNaturalIdCache(boolean skipped) {
+		delegate.enableNaturalIdCache(skipped);
+		return getThis();
+	}
+
+	@Override
 	public T applyInterceptor(Interceptor interceptor) {
 		delegate.applyInterceptor( interceptor );
 		return getThis();
