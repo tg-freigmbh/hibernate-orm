@@ -336,7 +336,7 @@ public class SessionFactoryOptionsBuilder implements SessionFactoryOptions {
 		this.autoCloseSessionEnabled = configurationService.getSetting( AUTO_CLOSE_SESSION, BOOLEAN, false );
 
 		this.statisticsEnabled = configurationService.getSetting( GENERATE_STATISTICS, BOOLEAN, false );
-		this.enableNaturalIdCache = !configurationService.getSetting(AvailableSettings.DISABLE_NATURAL_ID_RESOLUTIONS_CACHE, BOOLEAN,true);
+		this.enableNaturalIdCache = !configurationService.getSetting(AvailableSettings.DISABLE_NATURAL_ID_RESOLUTIONS_CACHE, BOOLEAN,false);
 		this.interceptor = determineInterceptor( configurationSettings, strategySelector );
 		this.statelessInterceptorSupplier = determineStatelessInterceptor( configurationSettings, strategySelector );
 		this.statementInspector = strategySelector.resolveStrategy(
